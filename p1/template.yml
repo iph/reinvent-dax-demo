@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: DAX Lambda Cluster Setup
+Mappings:
+  RegionMap:
+    us-east-2:
+      AZ1: "us-east-2a"
+      AZ2: "us-east-2b"
+Resources:
+  DaxLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.get
+      Runtime: nodejs6.10
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref Table
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            Path: /resources/{resourceId}
+            Method: get
+      Policies: AmazonDynamoDBReadOnlyAccess
+  DaxLambdaPut:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.put
+      Runtime: nodejs6.10
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref Table
+      Events:
+        PutResource:
+          Type: Api
+          Properties:
+            Path: /resources/{resourceId}
+            Method: put
+      Policies: AmazonDynamoDBFullAccess
+
+  Table:
+    Type: AWS::Serverless::SimpleTable
